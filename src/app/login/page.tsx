@@ -21,7 +21,7 @@ export default function LoginPage() {
     setTimeout(() => {
       login(email, email.split("@")[0]);
       setLoading(false);
-      router.push("/");
+      router.push("/home");
     }, 800);
   };
 
@@ -46,10 +46,11 @@ export default function LoginPage() {
               <label className="text-sm font-medium text-gray-700 mb-1 block">Email</label>
               <input
                 type="email"
+                autoComplete="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 required
-                className="w-full p-3 rounded-xl bg-gray-50 border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-rose-200"
+                className="w-full p-3 rounded-xl bg-gray-50 border border-gray-200 text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-rose-200"
                 placeholder="you@example.com"
               />
             </div>
@@ -58,10 +59,11 @@ export default function LoginPage() {
               <div className="relative">
                 <input
                   type={showPassword ? "text" : "password"}
+                  autoComplete="current-password"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   required
-                  className="w-full p-3 rounded-xl bg-gray-50 border border-gray-200 text-sm focus:outline-none focus:ring-2 focus:ring-rose-200 pr-10"
+                  className="w-full p-3 rounded-xl bg-gray-50 border border-gray-200 text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-rose-200 pr-10"
                   placeholder="••••••••"
                 />
                 <button

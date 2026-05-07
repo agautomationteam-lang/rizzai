@@ -18,6 +18,7 @@ export type CoachingMode = 'SOFT' | 'HARD' | 'EXTREME' | 'ROAST' | 'COACH';
 export interface DatingProfile {
   id: string;
   platform: 'Tinder' | 'Bumble' | 'Hinge' | 'OkCupid' | 'Other';
+  username?: string;
   profileUrl?: string;
   bio?: string;
   photos: string[];

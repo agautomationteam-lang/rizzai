@@ -62,15 +62,18 @@ body {
   animation: shimmer 1.5s infinite;
 }
 
-/* Autofill fix — prevent browser yellow background on dark inputs */
+/* Autofill fix — scoped strictly to webkit-autofill pseudo-class.
+   Uses the app's light theme colors explicitly so text is never invisible
+   regardless of WebView dark mode or prefers-color-scheme. */
 input:-webkit-autofill,
 input:-webkit-autofill:hover,
 input:-webkit-autofill:focus,
 textarea:-webkit-autofill,
 textarea:-webkit-autofill:hover,
 textarea:-webkit-autofill:focus {
-  -webkit-box-shadow: 0 0 0px 1000px #f9fafb inset;
-  -webkit-text-fill-color: #111827;
+  -webkit-box-shadow: 0 0 0px 1000px #f9fafb inset !important;
+  -webkit-text-fill-color: #111827 !important;
+  caret-color: #111827 !important;
   transition: background-color 5000s ease-in-out 0s;
 }
 

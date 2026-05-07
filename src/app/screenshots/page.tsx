@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Upload, X, Sparkles, Lock, ChevronRight, Copy, Check } from "lucide-react";
+import { Upload, X, Sparkles, Lock, ChevronRight, Copy, Check, Camera } from "lucide-react";
 import { useStore } from "@/lib/store";
 import { mockScreenshotAnalysis } from "@/lib/mockAi";
 import type { ScreenshotAnalysis } from "@/types";
@@ -51,7 +51,7 @@ export default function ScreenshotsPage() {
     <div className="space-y-6 pb-8">
       <div>
         <h1 className="text-2xl font-bold text-gray-900">Screenshot Analysis</h1>
-        <p className="text-sm text-gray-500">Upload chat screenshots for AI reading.</p>
+        <p className="text-sm text-gray-500">Upload a screenshot from your dating app chat and let AI read the room.</p>
       </div>
 
       {isDemo && (
@@ -84,11 +84,25 @@ export default function ScreenshotsPage() {
               ))}
               {images.length < 4 && (
                 <label className="aspect-[3/4] rounded-lg border-2 border-dashed border-gray-200 flex flex-col items-center justify-center cursor-pointer hover:bg-gray-50 transition">
-                  <Upload className="w-6 h-6 text-gray-400 mb-1" />
+                  <Camera className="w-6 h-6 text-gray-400 mb-1" />
                   <span className="text-xs text-gray-400">Upload</span>
                   <input type="file" accept="image/*" multiple className="hidden" onChange={handleImageUpload} />
                 </label>
               )}
+            </div>
+          </div>
+
+          <div className="bg-rose-50 rounded-xl p-4 border border-rose-100">
+            <div className="flex items-start gap-3">
+              <Camera className="w-5 h-5 text-rose-500 shrink-0 mt-0.5" />
+              <div>
+                <div className="text-sm font-medium text-rose-800">How it works</div>
+                <div className="text-xs text-rose-700 mt-1">
+                  Take a screenshot of your chat in Tinder, Bumble, or Hinge, then upload it here.
+                  Our AI will detect the platform, analyze emotions, estimate ghosting probability,
+                  and suggest the perfect reply.
+                </div>
+              </div>
             </div>
           </div>
 

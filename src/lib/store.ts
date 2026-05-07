@@ -1,5 +1,6 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
+import { appStorage } from './storage';
 import type { User, ProfileAnalysis, Conversation, ScreenshotAnalysis, GeneratedBio, ScoreCard, HistoryItem, CoachingMode, DatingProfile } from '@/types';
 
 interface AppState {
@@ -20,7 +21,8 @@ interface AppState {
     wingmanMessages: number;
     bioRewrites: number;
   };
-  
+  hasHydrated: boolean;
+
   // Actions
   setUser: (user: User | null) => void;
   login: (email: string, name: string) => void;
@@ -79,9 +81,10 @@ export const useStore = create<AppState>()(
         wingmanMessages: 0,
         bioRewrites: 0,
       },
+      hasHydrated: false,
 
       setUser: (user) => set({ user, isAuthenticated: !!user }),
-      
+
       login: (email, name) => {
         const user: User = {
           ...DEFAULT_USER,
@@ -91,18 +94,18 @@ export const useStore = create<AppState>()(
         };
         set({ user, isAuthenticated: true });
       },
-      
+
       logout: () => set({ user: null, isAuthenticated: false }),
-      
+
       completeOnboarding: () => {
         set((state) => ({
           user: state.user ? { ...state.user, onboardingComplete: true } : null,
           onboardingStep: 4,
         }));
       },
-      
+
       setOnboardingStep: (step) => set({ onboardingStep: step }),
-      
+
       addAnalysis: (analysis) => {
         set((state) => ({ analyses: [analysis, ...state.analyses] }));
         get().addHistoryItem({
@@ -113,11 +116,11 @@ export const useStore = create<AppState>()(
           createdAt: analysis.createdAt,
         });
       },
-      
+
       addConversation: (conversation) => {
         set((state) => ({ conversations: [conversation, ...state.conversations] }));
       },
-      
+
       addMessage: (conversationId, message) => {
         set((state) => ({
           conversations: state.conversations.map((c) =>
@@ -127,7 +130,7 @@ export const useStore = create<AppState>()(
           ),
         }));
       },
-      
+
       addScreenshotAnalysis: (analysis) => {
         set((state) => ({ screenshotAnalyses: [analysis, ...state.screenshotAnalyses] }));
         get().addHistoryItem({
@@ -138,7 +141,7 @@ export const useStore = create<AppState>()(
           createdAt: analysis.createdAt,
         });
       },
-      
+
       addGeneratedBio: (bio) => {
         set((state) => ({ generatedBios: [bio, ...state.generatedBios] }));
         get().addHistoryItem({
@@ -149,7 +152,7 @@ export const useStore = create<AppState>()(
           createdAt: bio.createdAt,
         });
       },
-      
+
       addScoreCard: (card) => {
         set((state) => ({ scoreCards: [card, ...state.scoreCards] }));
         get().addHistoryItem({
@@ -160,11 +163,11 @@ export const useStore = create<AppState>()(
           createdAt: card.createdAt,
         });
       },
-      
+
       addHistoryItem: (item) => {
         set((state) => ({ history: [item, ...state.history] }));
       },
-      
+
       consumeCredits: (amount) => {
         const { user } = get();
         if (!user || user.credits < amount) return false;
@@ -179,7 +182,7 @@ export const useStore = create<AppState>()(
         }));
         return true;
       },
-      
+
       addCredits: (amount) => {
         set((state) => ({
           user: state.user
@@ -187,7 +190,7 @@ export const useStore = create<AppState>()(
             : null,
         }));
       },
-      
+
       setCurrentMode: (mode) => set({ currentMode: mode }),
 
       upgradeTier: (tier) => {
@@ -284,6 +287,12 @@ export const useStore = create<AppState>()(
     }),
     {
       name: 'rizzai-storage',
+      storage: appStorage,
+      onRehydrateStorage: () => (state) => {
+        if (state) {
+          state.hasHydrated = true;
+        }
+      },
     }
   )
 );

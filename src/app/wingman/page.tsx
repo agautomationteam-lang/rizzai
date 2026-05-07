@@ -2,10 +2,11 @@
 
 import { useState, useRef, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Send, Copy, Check, ChevronDown, Sparkles, Lock, AlertTriangle } from "lucide-react";
+import { Send, Copy, Check, ChevronDown, Sparkles, Lock, AlertTriangle, ExternalLink } from "lucide-react";
 import { useStore } from "@/lib/store";
 import { mockWingmanReply } from "@/lib/mockAi";
 import type { ChatMessage, Conversation } from "@/types";
+import type { CoachingMode } from "@/types";
 import Link from "next/link";
 import AppSelect from "@/components/ui/app-select";
 
@@ -16,6 +17,12 @@ const modes = [
   { value: "ROAST", label: "Roast", color: "bg-orange-100 text-orange-700" },
   { value: "COACH", label: "Coach", color: "bg-emerald-100 text-emerald-700" },
 ] as const;
+
+const appDeepLinks: Record<string, string> = {
+  Tinder: "tinder://app",
+  Bumble: "bumble://",
+  Hinge: "hinge://",
+};
 
 export default function WingmanPage() {
   const { consumeCredits, addConversation, addMessage, conversations, currentMode, setCurrentMode, user, isDemo, recordDemoUsage } = useStore();
@@ -83,6 +90,13 @@ export default function WingmanPage() {
     setTimeout(() => setCopiedId(null), 2000);
   };
 
+  const openApp = () => {
+    const deep = appDeepLinks[platform];
+    if (deep) {
+      window.open(deep, "_system");
+    }
+  };
+
   const currentModeLabel = modes.find((m) => m.value === currentMode);
 
   return (
@@ -112,7 +126,7 @@ export default function WingmanPage() {
                 {modes.map((m) => (
                   <button
                     key={m.value}
-                    onClick={() => { setCurrentMode(m.value as any); setShowModeDropdown(false); }}
+                    onClick={() => { setCurrentMode(m.value as CoachingMode); setShowModeDropdown(false); }}
                     className={`w-full text-left px-3 py-2 text-xs hover:bg-gray-50 ${currentMode === m.value ? "font-bold" : ""}`}
                   >
                     {m.label}
@@ -131,7 +145,7 @@ export default function WingmanPage() {
             value={matchName}
             onChange={(e) => setMatchName(e.target.value)}
             placeholder="Match name (optional)"
-            className="flex-1 text-xs p-2 rounded-lg bg-gray-50 border border-gray-200 focus:outline-none focus:ring-2 focus:ring-rose-200"
+            className="flex-1 text-xs p-2 rounded-lg bg-gray-50 border border-gray-200 text-gray-900 focus:outline-none focus:ring-2 focus:ring-rose-200"
           />
           <div className="w-32">
             <AppSelect
@@ -162,16 +176,18 @@ export default function WingmanPage() {
           <div key={msg.id} className={`flex ${msg.role === "user" ? "justify-end" : "justify-start"}`}>
             <div className={`max-w-[85%] ${msg.role === "user" ? "bg-gray-900 text-white" : "bg-white border border-gray-100"} rounded-2xl px-4 py-3`}>
               <div className="text-sm leading-relaxed">{msg.content}</div>
-              
+
               {msg.role === "assistant" && msg.alternatives && (
                 <div className="mt-3 space-y-2 border-t border-gray-100 pt-2">
                   <div className="text-[10px] font-medium text-gray-400 uppercase">Alternatives</div>
                   {msg.alternatives.map((alt, i) => (
                     <div key={i} className="flex items-center justify-between gap-2 bg-gray-50 rounded-lg p-2">
                       <span className="text-xs text-gray-700">{alt}</span>
-                      <button onClick={() => copyText(alt, msg.id + i)}>
-                        {copiedId === msg.id + i ? <Check className="w-3 h-3 text-emerald-500" /> : <Copy className="w-3 h-3 text-gray-400" />}
-                      </button>
+                      <div className="flex items-center gap-1">
+                        <button onClick={() => copyText(alt, msg.id + i)}>
+                          {copiedId === msg.id + i ? <Check className="w-3 h-3 text-emerald-500" /> : <Copy className="w-3 h-3 text-gray-400" />}
+                        </button>
+                      </div>
                     </div>
                   ))}
                 </div>
@@ -226,22 +242,40 @@ export default function WingmanPage() {
             Out of credits — Upgrade to continue
           </Link>
         ) : (
-          <div className="flex items-end gap-2">
-            <textarea
-              value={input}
-              onChange={(e) => setInput(e.target.value)}
-              onKeyDown={(e) => { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); handleSend(); } }}
-              placeholder="Paste conversation or ask for help..."
-              className="flex-1 max-h-24 p-2 text-sm bg-gray-50 rounded-lg resize-none focus:outline-none focus:ring-2 focus:ring-rose-200"
-              rows={1}
-            />
-            <button
-              onClick={handleSend}
-              disabled={!input.trim() || loading}
-              className="p-2.5 rounded-lg gradient-rizz text-white disabled:opacity-50"
-            >
-              <Send className="w-4 h-4" />
-            </button>
+          <div className="space-y-2">
+            <div className="flex items-end gap-2">
+              <textarea
+                value={input}
+                onChange={(e) => setInput(e.target.value)}
+                onKeyDown={(e) => { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); handleSend(); } }}
+                placeholder="Paste conversation or ask for help..."
+                className="flex-1 max-h-24 p-2 text-sm bg-gray-50 rounded-lg resize-none text-gray-900 focus:outline-none focus:ring-2 focus:ring-rose-200"
+                rows={1}
+              />
+              <button
+                onClick={handleSend}
+                disabled={!input.trim() || loading}
+                className="p-2.5 rounded-lg gradient-rizz text-white disabled:opacity-50"
+              >
+                <Send className="w-4 h-4" />
+              </button>
+            </div>
+            {activeConversation && (
+              <div className="flex gap-2">
+                <button
+                  onClick={() => copyText(conversation?.messages[conversation.messages.length - 1]?.content || "", "last")}
+                  className="flex items-center gap-1 px-3 py-1.5 rounded-lg bg-gray-100 text-xs text-gray-700 font-medium hover:bg-gray-200 transition"
+                >
+                  <Copy className="w-3 h-3" /> Copy Reply
+                </button>
+                <button
+                  onClick={openApp}
+                  className="flex items-center gap-1 px-3 py-1.5 rounded-lg bg-gray-900 text-xs text-white font-medium hover:bg-gray-800 transition"
+                >
+                  <ExternalLink className="w-3 h-3" /> Open {platform}
+                </button>
+              </div>
+            )}
           </div>
         )}
       </div>
