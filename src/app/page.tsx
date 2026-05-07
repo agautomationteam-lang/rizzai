@@ -111,9 +111,9 @@ export default function LandingPage() {
                 <Link href="/signup" className="px-8 py-4 rounded-full gradient-rizz text-white font-semibold text-center hover:opacity-90 transition shadow-lg shadow-rose-200">
                   Get Started Free
                 </Link>
-                <a href="#how-it-works" className="px-8 py-4 rounded-full bg-white border border-gray-200 text-gray-700 font-semibold text-center hover:bg-gray-50 transition">
-                  See How It Works
-                </a>
+                <Link href="/demo" className="px-8 py-4 rounded-full bg-white border border-gray-200 text-gray-700 font-semibold text-center hover:bg-gray-50 transition">
+                  Try Demo
+                </Link>
               </div>
               <div className="mt-8 flex items-center gap-4 text-sm text-gray-500">
                 <div className="flex -space-x-2">
@@ -390,9 +390,14 @@ export default function LandingPage() {
         <div className="max-w-3xl mx-auto px-4 sm:px-6 text-center">
           <h2 className="text-3xl sm:text-4xl font-bold text-white mb-6">Ready to stop getting ghosted?</h2>
           <p className="text-white/90 text-lg mb-8">Join 50,000+ singles who use RizzAI to get more matches and better dates.</p>
-          <Link href="/signup" className="inline-block px-8 py-4 rounded-full bg-white text-rose-600 font-semibold hover:bg-gray-100 transition shadow-lg">
-            Get Started Free
-          </Link>
+          <div className="flex flex-col sm:flex-row gap-4 justify-center">
+            <Link href="/signup" className="inline-block px-8 py-4 rounded-full bg-white text-rose-600 font-semibold hover:bg-gray-100 transition shadow-lg">
+              Get Started Free
+            </Link>
+            <Link href="/demo" className="inline-block px-8 py-4 rounded-full bg-white/20 text-white font-semibold hover:bg-white/30 transition border border-white/30">
+              Try Demo — No Sign Up
+            </Link>
+          </div>
         </div>
       </section>
 

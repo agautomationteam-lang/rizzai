@@ -2,20 +2,21 @@
 
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Upload, X, ChevronRight, Sparkles, Copy, Check, Flame, MessageSquare, Share2, Lock } from "lucide-react";
+import { Upload, X, ChevronRight, Sparkles, Copy, Check, Flame, MessageSquare, Share2, Lock, AlertTriangle } from "lucide-react";
 import { useStore } from "@/lib/store";
 import { mockProfileAnalysis } from "@/lib/mockAi";
 import type { ProfileAnalysis } from "@/types";
 import Link from "next/link";
 
 export default function AnalyzerPage() {
-  const { consumeCredits, addAnalysis, user } = useStore();
+  const { consumeCredits, addAnalysis, user, isDemo, recordDemoUsage } = useStore();
   const [bioText, setBioText] = useState("");
   const [images, setImages] = useState<string[]>([]);
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState<ProfileAnalysis | null>(null);
   const [roastMode, setRoastMode] = useState(false);
   const [copiedBio, setCopiedBio] = useState(false);
+  const [demoLimitReached, setDemoLimitReached] = useState(false);
 
   const canAnalyze = user && user.credits >= (roastMode ? 3 : 1);
 
@@ -34,9 +35,17 @@ export default function AnalyzerPage() {
   };
 
   const handleAnalyze = async () => {
-    if (!canAnalyze) return;
+    if (!canAnalyze && !isDemo) return;
     const cost = roastMode ? 3 : 1;
-    if (!consumeCredits(cost)) return;
+    
+    if (isDemo) {
+      if (!recordDemoUsage('profile')) {
+        setDemoLimitReached(true);
+        return;
+      }
+    } else {
+      if (!consumeCredits(cost)) return;
+    }
     
     setLoading(true);
     const analysis = await mockProfileAnalysis(bioText, roastMode);
@@ -154,7 +163,20 @@ export default function AnalyzerPage() {
             )}
           </button>
 
-          {!canAnalyze && (
+          {demoLimitReached && (
+            <div className="bg-amber-50 rounded-xl p-4 border border-amber-200 flex items-start gap-3">
+              <AlertTriangle className="w-5 h-5 text-amber-600 shrink-0 mt-0.5" />
+              <div>
+                <div className="text-sm font-medium text-amber-800">Demo limit reached</div>
+                <div className="text-xs text-amber-700">
+                  You&apos;ve used all 3 profile analyses.{" "}
+                  <Link href="/signup" className="underline font-medium">Sign up free</Link> to continue.
+                </div>
+              </div>
+            </div>
+          )}
+
+          {!canAnalyze && !isDemo && (
             <Link href="/upgrade" className="block text-center text-sm text-rose-500 font-medium">
               Get more credits →
             </Link>

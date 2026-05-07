@@ -2,10 +2,11 @@
 
 import { useState } from "react";
 import { motion } from "framer-motion";
-import { Sparkles, Copy, Check, RefreshCw } from "lucide-react";
+import { Sparkles, Copy, Check, RefreshCw, AlertTriangle } from "lucide-react";
 import { useStore } from "@/lib/store";
 import { mockBioGeneration } from "@/lib/mockAi";
 import type { GeneratedBio } from "@/types";
+import AppSelect from "@/components/ui/app-select";
 
 const tones = [
   { value: "funny", label: "Funny", color: "bg-orange-100 text-orange-700 border-orange-200" },
@@ -14,16 +15,24 @@ const tones = [
 ];
 
 export default function BioPage() {
-  const { consumeCredits, addGeneratedBio } = useStore();
+  const { consumeCredits, addGeneratedBio, isDemo, recordDemoUsage } = useStore();
   const [traits, setTraits] = useState("");
   const [tone, setTone] = useState("genuine");
   const [platform, setPlatform] = useState("Tinder");
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState<GeneratedBio | null>(null);
   const [copiedIdx, setCopiedIdx] = useState<number | null>(null);
+  const [demoLimitReached, setDemoLimitReached] = useState(false);
 
   const handleGenerate = async () => {
-    if (!consumeCredits(1)) return;
+    if (isDemo) {
+      if (!recordDemoUsage('bio')) {
+        setDemoLimitReached(true);
+        return;
+      }
+    } else {
+      if (!consumeCredits(1)) return;
+    }
     setLoading(true);
     const traitList = traits.split(",").map((t) => t.trim()).filter(Boolean);
     const bio = await mockBioGeneration(traitList, tone, platform);
@@ -44,6 +53,19 @@ export default function BioPage() {
         <h1 className="text-2xl font-bold text-gray-900">Bio Rewriter</h1>
         <p className="text-sm text-gray-500">Generate better dating bios in seconds.</p>
       </div>
+
+      {demoLimitReached && (
+        <div className="bg-amber-50 rounded-xl p-4 border border-amber-200 flex items-start gap-3">
+          <AlertTriangle className="w-5 h-5 text-amber-600 shrink-0 mt-0.5" />
+          <div>
+            <div className="text-sm font-medium text-amber-800">Demo limit reached</div>
+            <div className="text-xs text-amber-700">
+              You&apos;ve used all 3 bio rewrites.{" "}
+              <a href="/signup" className="underline font-medium">Sign up free</a> to continue.
+            </div>
+          </div>
+        </div>
+      )}
 
       {!result && (
         <div className="space-y-4">
@@ -75,16 +97,17 @@ export default function BioPage() {
           </div>
 
           <div className="bg-white rounded-xl p-4 border border-gray-100">
-            <label className="text-sm font-medium text-gray-900 mb-2 block">Target Platform</label>
-            <select
+            <AppSelect
+              label="Target Platform"
               value={platform}
-              onChange={(e) => setPlatform(e.target.value)}
-              className="w-full p-3 rounded-lg bg-gray-50 border border-gray-200 text-sm focus:outline-none"
-            >
-              {["Tinder", "Bumble", "Hinge", "Other"].map((p) => (
-                <option key={p} value={p}>{p}</option>
-              ))}
-            </select>
+              onChange={setPlatform}
+              options={[
+                { value: "Tinder", label: "Tinder" },
+                { value: "Bumble", label: "Bumble" },
+                { value: "Hinge", label: "Hinge" },
+                { value: "Other", label: "Other" },
+              ]}
+            />
           </div>
 
           <button

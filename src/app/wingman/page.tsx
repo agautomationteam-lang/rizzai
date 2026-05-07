@@ -2,11 +2,12 @@
 
 import { useState, useRef, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Send, Image, Copy, Check, ChevronDown, Sparkles, Lock } from "lucide-react";
+import { Send, Copy, Check, ChevronDown, Sparkles, Lock, AlertTriangle } from "lucide-react";
 import { useStore } from "@/lib/store";
 import { mockWingmanReply } from "@/lib/mockAi";
 import type { ChatMessage, Conversation } from "@/types";
 import Link from "next/link";
+import AppSelect from "@/components/ui/app-select";
 
 const modes = [
   { value: "SOFT", label: "Soft", color: "bg-blue-100 text-blue-700" },
@@ -17,7 +18,7 @@ const modes = [
 ] as const;
 
 export default function WingmanPage() {
-  const { consumeCredits, addConversation, addMessage, conversations, currentMode, setCurrentMode, user } = useStore();
+  const { consumeCredits, addConversation, addMessage, conversations, currentMode, setCurrentMode, user, isDemo, recordDemoUsage } = useStore();
   const [input, setInput] = useState("");
   const [loading, setLoading] = useState(false);
   const [activeConversation, setActiveConversation] = useState<string | null>(null);
@@ -25,6 +26,7 @@ export default function WingmanPage() {
   const [platform, setPlatform] = useState("Tinder");
   const [copiedId, setCopiedId] = useState<string | null>(null);
   const [showModeDropdown, setShowModeDropdown] = useState(false);
+  const [demoLimitReached, setDemoLimitReached] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
 
   const conversation = conversations.find((c) => c.id === activeConversation);
@@ -34,7 +36,15 @@ export default function WingmanPage() {
   }, [conversation?.messages]);
 
   const handleSend = async () => {
-    if (!input.trim() || !consumeCredits(1)) return;
+    if (!input.trim()) return;
+    if (isDemo) {
+      if (!recordDemoUsage('wingman')) {
+        setDemoLimitReached(true);
+        return;
+      }
+    } else {
+      if (!consumeCredits(1)) return;
+    }
 
     let convId = activeConversation;
     if (!convId) {
@@ -123,15 +133,18 @@ export default function WingmanPage() {
             placeholder="Match name (optional)"
             className="flex-1 text-xs p-2 rounded-lg bg-gray-50 border border-gray-200 focus:outline-none focus:ring-2 focus:ring-rose-200"
           />
-          <select
-            value={platform}
-            onChange={(e) => setPlatform(e.target.value)}
-            className="text-xs p-2 rounded-lg bg-gray-50 border border-gray-200 focus:outline-none"
-          >
-            {["Tinder", "Bumble", "Hinge", "Other"].map((p) => (
-              <option key={p} value={p}>{p}</option>
-            ))}
-          </select>
+          <div className="w-32">
+            <AppSelect
+              value={platform}
+              onChange={setPlatform}
+              options={[
+                { value: "Tinder", label: "Tinder" },
+                { value: "Bumble", label: "Bumble" },
+                { value: "Hinge", label: "Hinge" },
+                { value: "Other", label: "Other" },
+              ]}
+            />
+          </div>
         </div>
       )}
 
@@ -196,8 +209,18 @@ export default function WingmanPage() {
       </div>
 
       {/* Input */}
+      {demoLimitReached && (
+        <div className="bg-amber-50 rounded-xl p-3 border border-amber-200 flex items-start gap-2 mb-3">
+          <AlertTriangle className="w-4 h-4 text-amber-600 shrink-0 mt-0.5" />
+          <div className="text-xs text-amber-700">
+            Demo limit reached. You&apos;ve used all 5 wingman messages.{" "}
+            <Link href="/signup" className="underline font-medium">Sign up free</Link> to continue.
+          </div>
+        </div>
+      )}
+
       <div className="bg-white rounded-xl border border-gray-100 p-3">
-        {(user?.credits || 0) < 1 ? (
+        {(user?.credits || 0) < 1 && !isDemo ? (
           <Link href="/upgrade" className="flex items-center justify-center gap-2 py-3 text-sm text-rose-500 font-medium">
             <Lock className="w-4 h-4" />
             Out of credits — Upgrade to continue

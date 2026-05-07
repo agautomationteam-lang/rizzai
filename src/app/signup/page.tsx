@@ -103,11 +103,19 @@ export default function SignupPage() {
             ))}
           </div>
 
-          <div className="mt-6 text-center text-sm text-gray-500">
-            Already have an account?{" "}
-            <Link href="/login" className="text-rose-500 font-medium hover:underline">
-              Log in
-            </Link>
+          <div className="mt-6 space-y-2 text-center">
+            <div className="text-sm text-gray-500">
+              Already have an account?{" "}
+              <Link href="/login" className="text-rose-500 font-medium hover:underline">
+                Log in
+              </Link>
+            </div>
+            <div className="text-xs text-gray-400">
+              Or{" "}
+              <Link href="/demo" className="text-rose-400 font-medium hover:underline">
+                try the demo without signing up
+              </Link>
+            </div>
           </div>
         </div>
       </motion.div>

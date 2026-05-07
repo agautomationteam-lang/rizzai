@@ -15,7 +15,7 @@ const quickActions = [
 ];
 
 export default function Dashboard() {
-  const { user, history, connectedProfiles } = useStore();
+  const { user, history, connectedProfiles, isDemo } = useStore();
   const recentHistory = history.slice(0, 3);
 
   return (

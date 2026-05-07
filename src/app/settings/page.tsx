@@ -1,16 +1,21 @@
 "use client";
 
 import { useStore } from "@/lib/store";
-import { LogOut, User, Crown, Coins, Bell, Shield, HelpCircle, Heart } from "lucide-react";
+import { LogOut, User, Crown, Coins, Bell, Shield, HelpCircle, Heart, X } from "lucide-react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 
 export default function SettingsPage() {
-  const { user, logout } = useStore();
+  const { user, logout, isDemo, exitDemo } = useStore();
   const router = useRouter();
 
   const handleLogout = () => {
     logout();
+    router.push("/");
+  };
+
+  const handleExitDemo = () => {
+    exitDemo();
     router.push("/");
   };
 
@@ -28,9 +33,16 @@ export default function SettingsPage() {
         </div>
         <div className="text-lg font-bold text-gray-900">{user?.displayName}</div>
         <div className="text-sm text-gray-500">{user?.email}</div>
-        <div className="mt-3 inline-flex items-center gap-1 px-3 py-1 rounded-full bg-amber-50 border border-amber-100 text-xs font-medium text-amber-700">
-          <Crown className="w-3 h-3" />
-          {user?.tier} Plan
+        <div className="mt-3 flex items-center justify-center gap-2">
+          <div className="inline-flex items-center gap-1 px-3 py-1 rounded-full bg-amber-50 border border-amber-100 text-xs font-medium text-amber-700">
+            <Crown className="w-3 h-3" />
+            {user?.tier} Plan
+          </div>
+          {isDemo && (
+            <div className="inline-flex items-center gap-1 px-3 py-1 rounded-full bg-rose-50 border border-rose-100 text-xs font-medium text-rose-700">
+              Demo Mode
+            </div>
+          )}
         </div>
       </div>
 
@@ -88,14 +100,24 @@ export default function SettingsPage() {
         </div>
       </div>
 
-      {/* Logout */}
-      <button
-        onClick={handleLogout}
-        className="w-full py-3 rounded-xl bg-rose-50 text-rose-600 font-medium flex items-center justify-center gap-2 hover:bg-rose-100 transition"
-      >
-        <LogOut className="w-4 h-4" />
-        Log Out
-      </button>
+      {/* Exit Demo / Logout */}
+      {isDemo ? (
+        <button
+          onClick={handleExitDemo}
+          className="w-full py-3 rounded-xl bg-amber-50 text-amber-700 font-medium flex items-center justify-center gap-2 hover:bg-amber-100 transition border border-amber-200"
+        >
+          <X className="w-4 h-4" />
+          Exit Demo
+        </button>
+      ) : (
+        <button
+          onClick={handleLogout}
+          className="w-full py-3 rounded-xl bg-rose-50 text-rose-600 font-medium flex items-center justify-center gap-2 hover:bg-rose-100 transition"
+        >
+          <LogOut className="w-4 h-4" />
+          Log Out
+        </button>
+      )}
 
       <div className="text-center text-xs text-gray-400">RizzAI v1.0 • Demo Build</div>
     </div>

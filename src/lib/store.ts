@@ -14,6 +14,12 @@ interface AppState {
   history: HistoryItem[];
   currentMode: CoachingMode;
   connectedProfiles: DatingProfile[];
+  isDemo: boolean;
+  demoUsage: {
+    profileAnalyses: number;
+    wingmanMessages: number;
+    bioRewrites: number;
+  };
   
   // Actions
   setUser: (user: User | null) => void;
@@ -34,6 +40,9 @@ interface AppState {
   upgradeTier: (tier: 'PREMIUM' | 'PRO') => void;
   addConnectedProfile: (profile: DatingProfile) => void;
   removeConnectedProfile: (id: string) => void;
+  startDemo: () => void;
+  exitDemo: () => void;
+  recordDemoUsage: (type: 'profile' | 'wingman' | 'bio') => boolean;
 }
 
 import type { ChatMessage } from '@/types';
@@ -64,6 +73,12 @@ export const useStore = create<AppState>()(
       history: [],
       currentMode: 'SOFT',
       connectedProfiles: [],
+      isDemo: false,
+      demoUsage: {
+        profileAnalyses: 0,
+        wingmanMessages: 0,
+        bioRewrites: 0,
+      },
 
       setUser: (user) => set({ user, isAuthenticated: !!user }),
       
@@ -195,6 +210,76 @@ export const useStore = create<AppState>()(
 
       removeConnectedProfile: (id) => {
         set((state) => ({ connectedProfiles: state.connectedProfiles.filter((p) => p.id !== id) }));
+      },
+
+      startDemo: () => {
+        set({
+          isDemo: true,
+          isAuthenticated: true,
+          user: {
+            ...DEFAULT_USER,
+            id: 'demo_' + Math.random().toString(36).slice(2, 8),
+            email: 'demo@rizzai.app',
+            displayName: 'Demo User',
+            credits: 999,
+            tier: 'FREE',
+            onboardingComplete: true,
+            hasActiveSubscription: false,
+          },
+          demoUsage: {
+            profileAnalyses: 0,
+            wingmanMessages: 0,
+            bioRewrites: 0,
+          },
+        });
+      },
+
+      exitDemo: () => {
+        set({
+          isDemo: false,
+          isAuthenticated: false,
+          user: null,
+          analyses: [],
+          conversations: [],
+          screenshotAnalyses: [],
+          generatedBios: [],
+          scoreCards: [],
+          history: [],
+          demoUsage: {
+            profileAnalyses: 0,
+            wingmanMessages: 0,
+            bioRewrites: 0,
+          },
+        });
+      },
+
+      recordDemoUsage: (type) => {
+        const { isDemo, demoUsage } = get();
+        if (!isDemo) return true;
+
+        const limits = {
+          profile: 3,
+          wingman: 5,
+          bio: 3,
+        };
+
+        const current = {
+          profile: demoUsage.profileAnalyses,
+          wingman: demoUsage.wingmanMessages,
+          bio: demoUsage.bioRewrites,
+        }[type];
+
+        if (current >= limits[type]) return false;
+
+        set((state) => ({
+          demoUsage: {
+            ...state.demoUsage,
+            ...(type === 'profile' ? { profileAnalyses: state.demoUsage.profileAnalyses + 1 } : {}),
+            ...(type === 'wingman' ? { wingmanMessages: state.demoUsage.wingmanMessages + 1 } : {}),
+            ...(type === 'bio' ? { bioRewrites: state.demoUsage.bioRewrites + 1 } : {}),
+          },
+        }));
+        return true;
       },
     }),
     {

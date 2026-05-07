@@ -9,7 +9,7 @@ import type { ScreenshotAnalysis } from "@/types";
 import Link from "next/link";
 
 export default function ScreenshotsPage() {
-  const { consumeCredits, addScreenshotAnalysis, user } = useStore();
+  const { consumeCredits, addScreenshotAnalysis, user, isDemo } = useStore();
   const [images, setImages] = useState<string[]>([]);
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState<ScreenshotAnalysis | null>(null);
@@ -54,9 +54,21 @@ export default function ScreenshotsPage() {
         <p className="text-sm text-gray-500">Upload chat screenshots for AI reading.</p>
       </div>
 
+      {isDemo && (
+        <div className="bg-amber-50 rounded-xl p-4 border border-amber-200 flex items-center gap-3">
+          <Lock className="w-5 h-5 text-amber-600 shrink-0" />
+          <div>
+            <div className="text-sm font-medium text-amber-800">Screenshot analysis is locked in demo</div>
+            <div className="text-xs text-amber-700">
+              Sign up free to unlock screenshot AI reading, ghosting detection, and reply suggestions.
+            </div>
+          </div>
+        </div>
+      )}
+
       {!result && (
         <div className="space-y-4">
-          <div className="bg-white rounded-xl p-4 border border-gray-100">
+          <div className={`bg-white rounded-xl p-4 border border-gray-100 ${isDemo ? "opacity-50 pointer-events-none" : ""}`}>
             <label className="text-sm font-medium text-gray-900 mb-2 block">Screenshots ({images.length}/4)</label>
             <div className="grid grid-cols-2 gap-2">
               {images.map((img, i) => (

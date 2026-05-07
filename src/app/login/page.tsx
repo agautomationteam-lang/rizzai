@@ -82,11 +82,19 @@ export default function LoginPage() {
             </button>
           </form>
 
-          <div className="mt-6 text-center text-sm text-gray-500">
-            Don&apos;t have an account?{" "}
-            <Link href="/signup" className="text-rose-500 font-medium hover:underline">
-              Sign up
-            </Link>
+          <div className="mt-6 space-y-2 text-center">
+            <div className="text-sm text-gray-500">
+              Don&apos;t have an account?{" "}
+              <Link href="/signup" className="text-rose-500 font-medium hover:underline">
+                Sign up
+              </Link>
+            </div>
+            <div className="text-xs text-gray-400">
+              Or{" "}
+              <Link href="/demo" className="text-rose-400 font-medium hover:underline">
+                try the demo without signing up
+              </Link>
+            </div>
           </div>
         </div>
       </motion.div>
