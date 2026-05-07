@@ -2,8 +2,9 @@
 
 import { motion } from "framer-motion";
 import { useStore } from "@/lib/store";
-import { Camera, MessageCircle, Upload, Zap, History, Coins, ChevronRight, Sparkles, TrendingUp, Flame, Heart } from "lucide-react";
+import { Camera, MessageCircle, Upload, Zap, History, Coins, ChevronRight, Sparkles, TrendingUp, Flame, Heart, Download, Smartphone } from "lucide-react";
 import Link from "next/link";
+import { useState, useEffect } from "react";
 
 const quickActions = [
   { href: "/profiles", icon: Heart, label: "My\nProfiles", color: "from-rose-400 to-orange-400" },
@@ -17,6 +18,12 @@ const quickActions = [
 export default function Dashboard() {
   const { user, history, connectedProfiles, isDemo } = useStore();
   const recentHistory = history.slice(0, 3);
+  const [showDownloadBanner, setShowDownloadBanner] = useState(false);
+
+  useEffect(() => {
+    const isStandalone = window.matchMedia("(display-mode: standalone)").matches || (window.navigator as any).standalone === true;
+    setShowDownloadBanner(!isStandalone);
+  }, []);
 
   return (
     <div className="space-y-6 pb-8">
@@ -27,6 +34,33 @@ export default function Dashboard() {
         </h1>
         <p className="text-sm text-gray-500 mt-1">Ready to level up your dating game?</p>
       </motion.div>
+
+      {/* Download App Banner (web only) */}
+      {showDownloadBanner && (
+        <motion.div
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.05 }}
+          className="bg-gradient-to-r from-gray-900 to-gray-800 rounded-xl p-4 text-white flex items-center gap-3"
+        >
+          <div className="w-10 h-10 rounded-lg bg-white/10 flex items-center justify-center shrink-0">
+            <Smartphone className="w-5 h-5 text-white" />
+          </div>
+          <div className="flex-1 min-w-0">
+            <div className="text-sm font-semibold">Get the Android App</div>
+            <div className="text-xs text-gray-400">Use RizzAI on the go — no browser needed</div>
+          </div>
+          <a
+            href="https://github.com/agautomationteam-lang/rizzai/releases/latest"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="shrink-0 inline-flex items-center gap-1 px-3 py-1.5 rounded-full bg-white text-gray-900 text-xs font-medium hover:bg-gray-100 transition"
+          >
+            <Download className="w-3 h-3" />
+            APK
+          </a>
+        </motion.div>
+      )}
 
       {/* Primary CTA Card */}
       <motion.div

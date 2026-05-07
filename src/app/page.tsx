@@ -1,7 +1,7 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { Heart, MessageCircle, Zap, Shield, Star, ChevronRight, Sparkles, TrendingUp, Users } from "lucide-react";
+import { Heart, MessageCircle, Zap, Shield, Star, ChevronRight, Sparkles, TrendingUp, Users, Download, Smartphone } from "lucide-react";
 import Link from "next/link";
 import { useState } from "react";
 
@@ -23,6 +23,11 @@ export default function LandingPage() {
       icon: <Zap className="w-6 h-6 text-white" />,
       title: "Screenshot Intelligence",
       desc: "Upload chat screenshots. Our AI reads emotions, detects ghosting probability, and tells you where you stand.",
+    },
+    {
+      icon: <Smartphone className="w-6 h-6 text-white" />,
+      title: "Native Android App",
+      desc: "Take RizzAI on the go. Download the APK and use all features offline — analyze profiles, coach chats, and screenshot anywhere.",
     },
   ];
 
@@ -114,6 +119,18 @@ export default function LandingPage() {
                 <Link href="/demo" className="px-8 py-4 rounded-full bg-white border border-gray-200 text-gray-700 font-semibold text-center hover:bg-gray-50 transition">
                   Try Demo
                 </Link>
+              </div>
+              <div className="mt-4">
+                <a
+                  href="https://github.com/agautomationteam-lang/rizzai/releases/latest"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-gray-900 text-white text-sm font-medium hover:bg-gray-800 transition"
+                >
+                  <Download className="w-4 h-4" />
+                  Download Android APK
+                </a>
+                <p className="text-xs text-gray-400 mt-2">Latest build · Free · No sign-up required</p>
               </div>
               <div className="mt-8 flex items-center gap-4 text-sm text-gray-500">
                 <div className="flex -space-x-2">
@@ -351,6 +368,52 @@ export default function LandingPage() {
               </Link>
             </div>
           </div>
+        </div>
+      </section>
+
+      {/* Download App */}
+      <section className="py-24 bg-gradient-to-br from-gray-900 to-gray-800">
+        <div className="max-w-4xl mx-auto px-4 sm:px-6 text-center">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+          >
+            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/10 text-white text-xs font-medium mb-6">
+              <Smartphone className="w-3 h-3" />
+              Android APK Available
+            </div>
+            <h2 className="text-3xl sm:text-4xl font-bold text-white mb-4">Take RizzAI everywhere</h2>
+            <p className="text-gray-400 max-w-xl mx-auto mb-8">
+              Download the Android app and get instant dating coaching on the go. No Play Store required — just install the APK and start winning.
+            </p>
+            <div className="flex flex-col sm:flex-row gap-4 justify-center">
+              <a
+                href="https://github.com/agautomationteam-lang/rizzai/releases/latest"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center justify-center gap-2 px-8 py-4 rounded-full bg-white text-gray-900 font-semibold hover:bg-gray-100 transition shadow-lg"
+              >
+                <Download className="w-5 h-5" />
+                Download APK
+              </a>
+              <Link href="/demo" className="inline-flex items-center justify-center gap-2 px-8 py-4 rounded-full bg-white/10 text-white font-semibold hover:bg-white/20 transition border border-white/20">
+                Try Web Demo First
+              </Link>
+            </div>
+            <div className="mt-8 grid grid-cols-3 gap-4 max-w-md mx-auto text-center">
+              {[
+                { label: "File Size", value: "~15 MB" },
+                { label: "Android", value: "8.0+" },
+                { label: "Free", value: "No ads" },
+              ].map((stat) => (
+                <div key={stat.label} className="bg-white/5 rounded-xl p-3 border border-white/10">
+                  <div className="text-lg font-bold text-white">{stat.value}</div>
+                  <div className="text-xs text-gray-400">{stat.label}</div>
+                </div>
+              ))}
+            </div>
+          </motion.div>
         </div>
       </section>
 
