@@ -1,9 +1,15 @@
 import { NextRequest, NextResponse } from "next/server";
 import Stripe from "stripe";
 
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY || "", {
-  apiVersion: "2026-04-22.dahlia",
-});
+function getStripe() {
+  const key = process.env.STRIPE_SECRET_KEY;
+  if (!key) {
+    throw new Error("STRIPE_SECRET_KEY is not set");
+  }
+  return new Stripe(key, {
+    apiVersion: "2026-04-22.dahlia",
+  });
+}
 
 export async function POST(req: NextRequest) {
   try {
@@ -12,10 +18,12 @@ export async function POST(req: NextRequest) {
 
     if (!process.env.STRIPE_SECRET_KEY) {
       return NextResponse.json(
-        { error: "Stripe is not configured. Add STRIPE_SECRET_KEY to .env.local" },
+        { error: "Stripe is not configured. Add STRIPE_SECRET_KEY to environment variables." },
         { status: 500 }
       );
     }
+
+    const stripe = getStripe();
 
     const session = await stripe.checkout.sessions.create({
       mode: "subscription",

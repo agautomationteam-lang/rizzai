@@ -1,15 +1,29 @@
 import { NextRequest, NextResponse } from "next/server";
 import Stripe from "stripe";
 
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY || "", {
-  apiVersion: "2026-04-22.dahlia",
-});
-
-const endpointSecret = process.env.STRIPE_WEBHOOK_SECRET || "";
+function getStripe() {
+  const key = process.env.STRIPE_SECRET_KEY;
+  if (!key) {
+    throw new Error("STRIPE_SECRET_KEY is not set");
+  }
+  return new Stripe(key, {
+    apiVersion: "2026-04-22.dahlia",
+  });
+}
 
 export async function POST(req: NextRequest) {
   const payload = await req.text();
   const sig = req.headers.get("stripe-signature") || "";
+
+  if (!process.env.STRIPE_SECRET_KEY || !process.env.STRIPE_WEBHOOK_SECRET) {
+    return NextResponse.json(
+      { error: "Stripe is not configured." },
+      { status: 500 }
+    );
+  }
+
+  const stripe = getStripe();
+  const endpointSecret = process.env.STRIPE_WEBHOOK_SECRET;
 
   let event: Stripe.Event;
 
