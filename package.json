@@ -7,11 +7,11 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
-    "build:mobile": "set CAPACITOR_BUILD=true && next build",
+    "build:mobile": "cross-env CAPACITOR_BUILD=true next build",
     "sync:android": "npx cap sync android",
-    "build:apk": "set CAPACITOR_BUILD=true && next build && npx cap sync android && cd android && .\\gradlew assembleDebug",
-    "build:apk:release": "set CAPACITOR_BUILD=true && next build && npx cap sync android && cd android && .\\gradlew assembleRelease",
-    "dev:mobile": "set CAPACITOR_BUILD=true && next build && npx cap sync android && npx cap run android"
+    "build:apk": "cross-env CAPACITOR_BUILD=true next build && npx cap sync android && cd android && .\\gradlew.bat assembleDebug",
+    "build:apk:release": "cross-env CAPACITOR_BUILD=true next build && npx cap sync android && cd android && .\\gradlew.bat assembleRelease",
+    "dev:mobile": "cross-env CAPACITOR_BUILD=true next build && npx cap sync android && npx cap run android"
   },
   "dependencies": {
     "@capacitor/android": "^8.3.1",
@@ -33,6 +33,7 @@
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",
+    "cross-env": "^10.1.0",
     "eslint": "^9",
     "eslint-config-next": "16.2.5",
     "tailwindcss": "^4",
